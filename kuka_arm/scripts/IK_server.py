@@ -198,14 +198,26 @@ def handle_calculate_IK(req):
         T6_G = get_mat(alpha6, a6, d7, q7)
         T6_G = T6_G.subs(s)
 
+        if print_individual_mat:
+            print('T0_1 Symbolic Matrix: {}'.format(T0_1))
+            #print('T0_1 Matrix: {}'.format(T0_1.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0})))
+
+        if 0:
+            T0_4 = simplify(T0_1 * T1_2 * T2_3 * T3_4)
+            print('T0_4 Matrix: {}'.format(T0_4.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0})))
 
         # composition of homogenous transforms
         T0_G = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_G
 
+        if 1:
+            print('T0_G_eval:{}'.format(T0_G.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0, q5:0, q6=0})))
+            print('T0_G:{}'.format(simplify(T0_G))
+            
         r, p, y = symbols('r p y')
         R_x = rot_x(r)
         R_y = rot_y(p)
         R_z = rot_z(y)
+        # this is the correction term
         R_corr = R_z.subs(y,pi) *R_y.subs(p,-pi/2)
         Rrpy = R_z * R_y * R_x * R_corr
 
@@ -222,9 +234,9 @@ def handle_calculate_IK(req):
             # IK code starts here
             joint_trajectory_point = JointTrajectoryPoint()
 
-	    # Extract end-effector position and orientation from request
-	    # px,py,pz = end-effector position
-	    # roll, pitch, yaw = end-effector orientation
+            # Extract end-effector position and orientation from request
+            # px,py,pz = end-effector position
+            # roll, pitch, yaw = end-effector orientation
             px = req.poses[x].position.x
             py = req.poses[x].position.y
             pz = req.poses[x].position.z
@@ -237,16 +249,17 @@ def handle_calculate_IK(req):
             gripper_angles = [roll, pitch, yaw]
 
             ### Your IK code here
-	    # Compensate for rotation discrepancy between DH parameters and Gazebo
-	    #
+            # Compensate for rotation discrepancy between DH parameters and Gazebo
+            #
             print ('Processing IK request:{}'.format(x))
             thetas, wc = inverse_kinematics(gripper_position, gripper_angles, aux_variables)
             [theta1, theta2, theta3, theta4, theta5, theta6] = thetas
             [wx,wy,wz] = wc
-	    #
-	    # Calculate joint angles using Geometric IK method
-	    #
-	    #
+            
+            #
+            # Calculate joint angles using Geometric IK method
+            #
+            #
             ###
 
             # Populate response for the IK request
