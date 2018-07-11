@@ -134,7 +134,8 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables, test_cas
     theta1 = atan2(wy,wx)
     theta2 = pi/2 - angle_a - atan2(wc_z_joint2, r_xy)
     theta3 = pi/2 - (angle_b - angle_3_4) # is this correct?
-
+    
+    # computing theta 4 to 6 (decouple wrist center from rotation for 4 and 6 only look at R3_6 that is wrist rotation)
     # get the rotation from base joint 0 to joint 3
     R0_3 = aux_variables['R0_3']
     q1, q2, q3, q6 = aux_variables['q_symbols']
@@ -150,8 +151,8 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables, test_cas
     # simplify
     # R3_4(y) * R4_5(z) * rotx(pi/2) * R5_6(z)
     if 0:
-        ipdb.set_trace()
-        dd = simplify(rot_y(theta4)* rot_z(theta5)*rot_x(pi/2)*rot_z(q6))
+      db1 = simplify(rot_y(theta4)* rot_z(theta5)*rot_x(pi/2)*rot_z(q6))
+      print ('db1:{}'.format(db1))
 
     thetas = [theta1, theta2, theta3, theta4, theta5, theta6]
     wc = [wx,wy,wz]
