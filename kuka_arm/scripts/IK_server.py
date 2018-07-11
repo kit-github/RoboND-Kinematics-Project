@@ -97,6 +97,10 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables):
     roll, pitch, yaw = gripper_angles
     Rrpy = aux_variables['Rrpy']
     r,p,y = aux_variables['rpy_symbols']
+
+    # in the rotation matrix use the roll, pitch and yaw angle obtained from the gripper pose (orientation)
+    # gripper pose isn't the same as urdf so there was a correction term.
+    # Rrpy is the wrist orientation in urdf convention
     Rrpy = Rrpy.subs({'r':roll, 'p':pitch, 'y':yaw})
 
     # calculation to get the wrist center

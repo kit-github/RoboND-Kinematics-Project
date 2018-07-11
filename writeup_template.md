@@ -168,6 +168,23 @@ Matrix([
 
 #### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; doing so derive the equations to calculate all individual joint angles.
 
+
+since the last 3 joints are revolute and their axes intersect at a single point we have a case of spherical wrist with joint_5 being the wrist center. Spherical wrist allows us to kinematically decouple Inverse kinematics into inverse position and inverse orientation. That is instead of solving 12 non-linear equations, it is now possible to independently solve 2 simpler problems -- 1. cartesian coordiates of the wrist center  2. composition of the rrotations to orient the end effector
+
+
+1. Compute the end-effector pose with respect to the base_link that is R_rpy (using the correctional rotational matrix)
+   R_rpy = rot(z,yaw) * rot(y, pitch) * rot(x, roll) * R_corr.
+
+   We get the yaw, pitch and roll from the euler_from_quaternions() function
+
+2. Get the nx, ny, nz from the R_rpy. 
+3. px, py, pz is obtained from the gripper position.
+4. using this info and substituting for d6 and l
+
+
+
+
+
 And here's where you can draw out and show your math for the derivation of your theta angles. 
 Figure and Derivation ![drawing](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/notes_derivation.png))
 
