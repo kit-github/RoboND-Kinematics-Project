@@ -137,7 +137,7 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables, test_cas
 
     # get the rotation from base joint 0 to joint 3
     R0_3 = aux_variables['R0_3']
-    q1, q2, q3 = aux_variables['q_symbols']
+    q1, q2, q3, q6 = aux_variables['q_symbols']
     R0_3 = R0_3.evalf(subs={q1:theta1, q2:theta2, q3:theta3})
     R3_6 = R0_3.T * R_EE
 
@@ -149,8 +149,9 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables, test_cas
 
     # simplify
     # R3_4(y) * R4_5(z) * rotx(pi/2) * R5_6(z)
-    ipdb.set_trace()
-    simplify(rot_y(theta4)* rot_z(theta5)*rot_x(pi/2)*rot_z(q6))
+    if 0:
+        ipdb.set_trace()
+        dd = simplify(rot_y(theta4)* rot_z(theta5)*rot_x(pi/2)*rot_z(q6))
 
     thetas = [theta1, theta2, theta3, theta4, theta5, theta6]
     wc = [wx,wy,wz]
@@ -248,7 +249,7 @@ def test_code(test_case):
     do_simple = False
     fn_apply = simplify if do_simple == True else lambda(x):x
 
-    if 0:
+    if 1:
         T0_2 = fn_apply(T0_1 * T1_2)
         T0_3 = fn_apply(T0_2 * T2_3)
         T0_4 = fn_apply(T0_3 * T3_4)
@@ -264,7 +265,7 @@ def test_code(test_case):
     R_G_corrected = R_G_corrected.col_join(Matrix([[0,0,0,1]]))
 
     # Numerically evaluate transforms
-    if 0:
+    if 1:
         print("T0_1 = ", T0_1.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}))
         print("T0_2 = ", T0_2.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}))
         print("T0_3 = ", T0_3.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}))
@@ -286,7 +287,7 @@ def test_code(test_case):
 
     aux_variables = {'R0_3': R0_3,
                      'R_EE': R_EE,
-                     'q_symbols':(q1,q2,q3),
+                     'q_symbols':(q1,q2,q3,q6),
                      'rpy_symbols':(r,p,y)}
 
     if 0:
@@ -303,8 +304,8 @@ def test_code(test_case):
     theta1, theta2, theta3, theta4, theta5, theta6 = thetas
 
 
-    #ipdb.set_trace()
 
+    ipdb.set_trace()
 
     ##
     ########################################################################################
@@ -319,6 +320,7 @@ def test_code(test_case):
     your_wc = wc
     your_ee = FK[0:3,3]
 
+    ipdb.set_trace()
     ## End your code input for forward kinematics here!
     ########################################################################################
 

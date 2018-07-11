@@ -24,7 +24,7 @@ from numpy import array
 from sympy import symbols, cos, sin, pi, simplify, sqrt, atan2
 import ipdb
 
-np.set_printoptions(precision=4)    
+np.set_printoptions(precision=4)
 
 def get_mat(alpha0_, a0_, d1_, q1_):
     """
@@ -78,7 +78,7 @@ def rot_z(q):
     return R_z
 
 
-def inverse_kinematics(gt_gripper_position, gt_gripper_angles, forward_transforms):
+def inverse_kinematics(gt_gripper_position, gt_gripper_orientation_quaternion, forward_transforms):
 
     gripper_angles = transformations.euler_from_quaternion(gt_gripper_orientation_quaternion)
     print ("euler angles for gripper using ROS simulation: {}".format(gripper_angles))
@@ -93,7 +93,7 @@ def inverse_kinematics(gt_gripper_position, gt_gripper_angles, forward_transform
     nx, ny, nz = Rrpy[:,2]
     px, py, pz = gt_gripper_position # can also be T_total_val[1:4,4]
 
-    d6_val = 0; l_val = 0.303 
+    d6_val = 0; l_val = 0.303
     wx = px - (d6_val + l_val)*nx
     wy = py - (d6_val + l_val)*ny
     wz = pz - (d6_val + l_val)*nz
@@ -110,7 +110,7 @@ def inverse_kinematics(gt_gripper_position, gt_gripper_angles, forward_transform
     wc_xy_joint2 = sqrt(wx*wx + wy*wy) - 0.35
     side_b = sqrt(pow(wc_xy_joint2, 2) + pow(wc_z_joint2, 2))
 
-    
+
     def cos_angle(opp_side, side1, side2):
        return  acos( (side1 * side1 + side2 * side2 - opp_side * opp_side)  / (2 * side1 * side2))
 
@@ -119,7 +119,7 @@ def inverse_kinematics(gt_gripper_position, gt_gripper_angles, forward_transform
 
     def get_euler_angles_from_rot_mat_x_y_z(rot_mat):
         """
-        sequence of extrinsic x, y and z is same as intrinsic with order z, y, x 
+        sequence of extrinsic x, y and z is same as intrinsic with order z, y, x
         """
         alpha = atan2(rot_mat[1,0],rot_mat[0,0]) # rotation about z''
         gamma  = atan2(rot_mat[2,1], rot_mat[2,2]) # rotation about x
@@ -130,23 +130,23 @@ def inverse_kinematics(gt_gripper_position, gt_gripper_angles, forward_transform
         """
         if extrinsic rotation with rotation about the common origin o5 and
         z axis, y axis and z axis was peformed, discounting the axis shifts
-        in the coordinate frames. 
-        
+        in the coordinate frames.
+
         rot_3_6 = simplify(rot_z(q4)*rot_y(q5)*rot_z(q6))
-        
+
         rot_3_6 = [
         [-sin(q4)*sin(q6) + cos(q4)*cos(q5)*cos(q6), -sin(q4)*cos(q6) - sin(q6)*cos(q4)*cos(q5), sin(q5)*cos(q4)],
         [ sin(q4)*cos(q5)*cos(q6) + sin(q6)*cos(q4), -sin(q4)*sin(q6)*cos(q5) + cos(q4)*cos(q6), sin(q4)*sin(q5)],
         [                          -sin(q5)*cos(q6),                            sin(q5)*sin(q6),         cos(q5)]
         ]
-        """        
+        """
         theta6 = atan2(-rot_3_6[2,1], rot_3_6[2,0])
         theta4 = atan2(rot_3_6[1,2], rot_3_6[0,2])
 
     angle_a = cos_angle(side_a, side_b, side_c)
     angle_b = cos_angle(side_b, side_a, side_c)
     angle_c = cos_angle(side_c, side_a, side_b)
-    
+
     theta2 = pi/2 - angle_a - atan2(wc_z_joint2, wc_xy_joint2)
     angle_3_4 = atan2(-0.054,1.50)
     # not sure how theta3 is pi/2 - angle_b
@@ -205,22 +205,22 @@ def main():
 
     T0_1 = get_mat(alpha0, a0, d1, q1)
     T0_1 = T0_1.subs(s)
-    
+
     T1_2 = get_mat(alpha1, a1, d2, q2)
     T1_2 = T1_2.subs(s)
-    
+
     T2_3 = get_mat(alpha2, a2, d3, q3)
     T2_3 = T2_3.subs(s)
-    
+
     T3_4 = get_mat(alpha3, a3, d4, q4)
     T3_4 = T3_4.subs(s)
 
     T4_5 = get_mat(alpha4, a4, d5, q5)
     T4_5 = T4_5.subs(s)
-    
+
     T5_6 = get_mat(alpha5, a5, d6, q6)
     T5_6 = T5_6.subs(s)
-    
+
     T6_G = get_mat(alpha6, a6, d7, q7)
     T6_G = T6_G.subs(s)
 
@@ -228,7 +228,8 @@ def main():
     # composition of homogenous transforms
     do_simple = False
     fn_apply = simplify if do_simple == True else lambda(x):x
-    
+
+    ipdb.set_trace()
     T0_2 = fn_apply(T0_1 * T1_2)
     T0_3 = fn_apply(T0_2 * T2_3)
     T0_4 = fn_apply(T0_3 * T3_4)
@@ -240,7 +241,7 @@ def main():
     R_G_corrected_3x3 = simplify(rot_z(ang1)*rot_y(ang2))
     R_G_corrected = R_G_corrected_3x3.row_join(Matrix([[0],[0],[0]]))
     R_G_corrected = R_G_corrected.col_join(Matrix([[0,0,0,1]]))
-                                           
+
     # Numerically evaluate transforms
     print("T0_1 = ", T0_1.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}))
     print("T0_2 = ", T0_2.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}))
@@ -249,10 +250,10 @@ def main():
     print("T0_5 = ", T0_5.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}))
     print("T0_6 = ", T0_6.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}))
     print("T0_G = ", T0_G.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}))
-    
+
     T_total = T0_G * R_G_corrected
     T_total_val = T_total.evalf(subs={q1:0, q2:0, q3:0, q4:0, q5:0, q6:0})
-    print("T0_total = ", T_total_val) 
+    print("T0_total = ", T_total_val)
 
     gt_gripper_position=[2.51286, 0, 1.94653]
     gt_gripper_orientation_quaternion = [0, -0.00014835, 0, 1]
@@ -265,13 +266,12 @@ def main():
     # ground truth position for the gripper using rviz
     gt_rot_mat = transformations.quaternion_matrix(gt_gripper_orientation_quaternion)
     print("ground truth poisiton: {} rot_mat:{} = ".format(gt_gripper_position, gt_rot_mat))
-
+    ipdb.set_trace()
     thetas = inverse_kinematics(gt_gripper_position, gt_gripper_orientation_quaternion, forward_transforms)
-    
+
     #print ("wrist centers: wx:{} wy:{} wz:{}".format(wx,wy,wz))268
-    
+
     return T_total, T0_G
 
 if __name__ == '__main__':
     main()
-

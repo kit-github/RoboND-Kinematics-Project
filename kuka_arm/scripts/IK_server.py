@@ -198,7 +198,9 @@ def handle_calculate_IK(req):
         T6_G = get_mat(alpha6, a6, d7, q7)
         T6_G = T6_G.subs(s)
 
+        print_individual_mat = False
         if print_individual_mat:
+            ipdb.set_trace()
             print('T0_1 Symbolic Matrix: {}'.format(T0_1))
             #print('T0_1 Matrix: {}'.format(T0_1.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0})))
 
@@ -209,9 +211,9 @@ def handle_calculate_IK(req):
         # composition of homogenous transforms
         T0_G = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_G
 
-        if 1:
-            print('T0_G_eval:{}'.format(T0_G.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0, q5:0, q6=0})))
-            print('T0_G:{}'.format(simplify(T0_G))
+        if 0:
+            print('T0_G_eval:{}'.format(T0_G.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0, q5:0, q6:0})))
+            print('T0_G:{}'.format(simplify(T0_G)))
             
         r, p, y = symbols('r p y')
         R_x = rot_x(r)
