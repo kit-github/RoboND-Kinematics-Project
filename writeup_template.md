@@ -179,7 +179,13 @@ since the last 3 joints are revolute and their axes intersect at a single point 
 
 2. Get the nx, ny, nz from the R_rpy. 
 3. px, py, pz is obtained from the gripper position.
-4. using this info and substituting for d6 and l
+4. using this info and substituting for d6 and l we can get the wx, wy, wz.
+
+The wrist center wx, wy, wz depends on the joint angles theta1, theta2, theta3. Using trignometry and projecting hte axis in subspaces, we can find these angles. Please see figure below for more details. In particular, the firstjoint only rotates around the z axis. We subtract the x and z shift to get the x,y, z location of joint_2 and joint_3, with respect to joint_1. Once this is done, it is easier to calculate angle_a, angle_b and angle_c (see figure 2 below). side_a  and side_c are computed 
+
+
+
+
 
 
 
