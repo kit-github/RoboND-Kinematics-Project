@@ -22,13 +22,12 @@ import numpy as np
 from numpy import array
 from sympy import symbols, cos, sin, pi, simplify, sqrt, atan2
 
-
 def get_rot_mat(T0):
     return T0[0:3,0:3]
 
 
 def cos_angle(opp_side, side1, side2):
-    return  acos( (side1 * side1 + side2 * side2 - opp_side * opp_side)  / (2 * side1 * side2))
+    return  acos( (side1 * side1 + side2 * side2 - opp_side * opp_side)  / (2 * side1 * side2 ))
 
 
 def get_euler_angles_from_rot_mat_x_y_z(rot_mat):
@@ -104,7 +103,7 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables):
     R_EE = R_EE.subs({'r':roll, 'p':pitch, 'y':yaw})
 
     # calculation to get the wrist center
-    nx, ny, nz = R_rpy[:,2]
+    nx, ny, nz = R_EE[:,2]
     px, py, pz = gripper_position # can also be T_total_val[1:4,4]
     d6_val = 0; l_val = 0.303
     wx = px - (d6_val + l_val)*nx
@@ -136,9 +135,9 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables):
 
     R0_3 = R0_3.evalf(subs={q1:theta1, q2:theta2, q3:theta3})
     if 0:
-        R3_6 = R0_3.T * R_rpy
+        R3_6 = R0_3.T * R_EE
     else:
-        R3_6 = R0_3.inv("LU") * R_rpy
+        R3_6 = R0_3.inv("LU") * R_EE
     # Euler angles for rotation matrix
     # simplify(rot_x(-pi/2)*rot_z(q4)*rot_y(q5)*rot_x(pi/2)*rot_z(q6)*R_corr)
     theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
@@ -150,6 +149,7 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables):
     return thetas, wc
 
 def handle_calculate_IK(req):
+
     rospy.loginfo("Received %s eef-poses from the plan" % len(req.poses))
     if len(req.poses) < 1:
         print "No valid poses received"
@@ -204,11 +204,10 @@ def handle_calculate_IK(req):
         T6_G = get_mat(alpha6, a6, d7, q7)
         T6_G = T6_G.subs(s)
 
-        print_debug_info = False
-
         # composition of homogenous transforms
         T0_G = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_G
 
+        print_debug_info = False
         if print_debug_info:
             print('T0_1 Symbolic Matrix: {}'.format(T0_1))
             #print('T0_1 Matrix: {}'.format(T0_1.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0})))
@@ -256,18 +255,9 @@ def handle_calculate_IK(req):
             gripper_angles = [roll, pitch, yaw]
 
             ### Your IK code here
-            # Compensate for rotation discrepancy between DH parameters and Gazebo
-            #
-            # print ('Processing IK request:{}'.format(x))
             thetas, wc = inverse_kinematics(gripper_position, gripper_angles, aux_variables)
             [theta1, theta2, theta3, theta4, theta5, theta6] = thetas
             [wx,wy,wz] = wc
-            
-            #
-            # Calculate joint angles using Geometric IK method
-            #
-            #
-            ###
 
             # Populate response for the IK request
             # In the next line replace theta1,theta2...,theta6 by your joint angle variables
