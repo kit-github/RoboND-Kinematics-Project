@@ -49,9 +49,9 @@ To get the DH parameters.
 5. Identify common normal between Z_{i-1} and Z_{i}
 Allocate the X axis based on the DH parameter rules. Please see figure for more details.
 
-DH parameters and axis allocation ![DH parameters](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/dh_parameters_hand.png)
+DH parameters and axis allocation ![DH parameters](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/dh_parameter_hand.png)
 
-DH parameters and axis allocation ![DH parameters](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/dh_parameters_table_hand.png)
+DH parameters table derivation ![DH parameters](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/dh_parameter_table_hand.png)
 
 Links | alpha(i-1) | a(i-1) | d(i)   | theta(i)
 ---   | ---        | ---    | ---    | ---
@@ -242,8 +242,6 @@ Here we subtract angle_3_4 because in zeroth configuration we have that angle.
 #####  Computing theta4, theta5, theta6 from R3_6 
  1. We first compute R3_6. Once theta1, theta2, theta3 is known, we can compute R0_3 and multiply its inv(R0_3) with R_rpy to get R3_6. 
  2. Compute the euler angles corresponding to the matrix R3_6. This can be done by realizing that the pose is a composition of the following R3_6 = rot_x(-pi/2) * rot_z(q4) * rot_y(q5) * rot_x(pi/2) * rot_z(q6) * R_corr
-
-Derivation for angle theta4, theta5, theta6 ![course_fig](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/angle_derivation_hand.png))
 
 
 ### Project Implementation
