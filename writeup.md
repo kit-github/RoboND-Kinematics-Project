@@ -261,7 +261,3 @@ The DH parameters and visualization was conceptually not easy. Had to revisit to
 Did unit test the Inverse Kinematics part using the IK_Debug.py and made sure it works on the test cases. 
 
 
-And just for fun, another example image:
-![alt text][image3]
-
-
