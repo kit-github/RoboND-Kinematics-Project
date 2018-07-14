@@ -249,12 +249,20 @@ Here we subtract angle_3_4 because in zeroth configuration we have that angle.
 
 #### 1. Fill in the `IK_server.py` file with properly commented python code for calculating Inverse Kinematics based on previously performed Kinematic Analysis. Your code must guide the robot to successfully complete 8/10 pick and place cycles. Briefly discuss the code you implemented and your results. 
 
- -- Add some screen shots to show how this worked. 
- -- it doesn't work. Perhaps use inv(R0_3) instead of R0_3.T
- -- also the side angle 
+##### Run1 
+Screen shot run1 (in between) ![hand_drawing1](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/drop1.png))
+Screen shot run1 (target drop) ![hand_drawing1](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/drop1_final.png))
 
-Here I'll talk about the code, what techniques I used, what worked and why, where the implementation might fail and how I might improve it if I were going to pursue this project further.  
-  - Not sure what??     
+##### Run2 
+Screen shot run2 (in between) ![hand_drawing1](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/drop2.png))
+Screen shot run2 (target drop) ![hand_drawing1](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/drop2_final.png))
+
+Did some optimization. Took part of the computation that are common and static out of the for loop to speed computation. 
+The code for computing Inverse Kinematics is still somewhat slow, even after those optimizations. Further factoring the code may improve speed. 
+
+The DH parameters and visualization was conceptually not easy. Had to revisit to get a better understanding. 
+
+Did unit test the Inverse Kinematics part using the IK_Debug.py and made sure it works on the test cases. 
 
 
 And just for fun, another example image:
