@@ -95,13 +95,13 @@ def rot_z(q):
 def inverse_kinematics(gripper_position, gripper_angles, aux_variables):
 
     roll, pitch, yaw = gripper_angles
-    Rrpy = aux_variables['Rrpy']
+    R_EE = aux_variables['R_EE']
     r,p,y = aux_variables['rpy_symbols']
 
     # in the rotation matrix use the roll, pitch and yaw angle obtained from the gripper pose (orientation)
     # gripper pose isn't the same as urdf so there was a correction term.
-    # Rrpy is the wrist orientation in urdf convention
-    Rrpy = Rrpy.subs({'r':roll, 'p':pitch, 'y':yaw})
+    # R_EE is the wrist orientation in urdf convention
+    R_EE = R_EE.subs({'r':roll, 'p':pitch, 'y':yaw})
 
     # calculation to get the wrist center
     nx, ny, nz = R_rpy[:,2]
@@ -135,8 +135,10 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables):
     q1, q2, q3 = aux_variables['q_symbols']
 
     R0_3 = R0_3.evalf(subs={q1:theta1, q2:theta2, q3:theta3})
-    R3_6 = R0_3.T * R_rpy
-
+    if 0:
+        R3_6 = R0_3.T * R_rpy
+    else:
+        R3_6 = R0_3.inv("LU") * R_rpy
     # Euler angles for rotation matrix
     # simplify(rot_x(-pi/2)*rot_z(q4)*rot_y(q5)*rot_x(pi/2)*rot_z(q6)*R_corr)
     theta5 = atan2(sqrt(R3_6[0,2]*R3_6[0,2] + R3_6[2,2]*R3_6[2,2]), R3_6[1,2])
@@ -202,36 +204,34 @@ def handle_calculate_IK(req):
         T6_G = get_mat(alpha6, a6, d7, q7)
         T6_G = T6_G.subs(s)
 
-        print_individual_mat = False
-        if print_individual_mat:
-            ipdb.set_trace()
-            print('T0_1 Symbolic Matrix: {}'.format(T0_1))
-            #print('T0_1 Matrix: {}'.format(T0_1.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0})))
-
-        if 0:
-            T0_4 = simplify(T0_1 * T1_2 * T2_3 * T3_4)
-            print('T0_4 Matrix: {}'.format(T0_4.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0})))
+        print_debug_info = False
 
         # composition of homogenous transforms
         T0_G = T0_1 * T1_2 * T2_3 * T3_4 * T4_5 * T5_6 * T6_G
 
-        if 0:
+        if print_debug_info:
+            print('T0_1 Symbolic Matrix: {}'.format(T0_1))
+            #print('T0_1 Matrix: {}'.format(T0_1.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0})))
+
+            T0_4 = simplify(T0_1 * T1_2 * T2_3 * T3_4)
+            print('T0_4 Matrix: {}'.format(T0_4.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0})))
+
             print('T0_G_eval:{}'.format(T0_G.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0, q5:0, q6:0})))
             print('T0_G:{}'.format(simplify(T0_G)))
 
-        # Rrpy is the rotation transform between the gripper and the 
+        # R_EE is the rotation transform between the gripper and the 
         r, p, y = symbols('r p y')
         R_x = rot_x(r)
         R_y = rot_y(p)
         R_z = rot_z(y)
         # this is the correction term
         R_corr = R_z.subs(y,pi) *R_y.subs(p,-pi/2)
-        Rrpy = R_z * R_y * R_x * R_corr
+        R_EE = R_z * R_y * R_x * R_corr
 
         R0_3 = get_rot_mat(T0_1) * get_rot_mat(T1_2) * get_rot_mat(T2_3)
 
         aux_variables = {'R0_3': R0_3,
-                         'Rrpy': Rrpy,
+                         'R_EE': R_EE,
                          'rpy_symbols': (r,p,y),
                          'q_symbols':(q1,q2,q3)}
 
@@ -258,7 +258,7 @@ def handle_calculate_IK(req):
             ### Your IK code here
             # Compensate for rotation discrepancy between DH parameters and Gazebo
             #
-            print ('Processing IK request:{}'.format(x))
+            # print ('Processing IK request:{}'.format(x))
             thetas, wc = inverse_kinematics(gripper_position, gripper_angles, aux_variables)
             [theta1, theta2, theta3, theta4, theta5, theta6] = thetas
             [wx,wy,wz] = wc

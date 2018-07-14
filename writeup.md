@@ -53,6 +53,7 @@ DH parameters and axis allocation ![DH parameters](https://github.com/kit-github
 
 DH parameters table derivation ![DH parameters](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/dh_parameter_table_hand.png)
 
+
 Links | alpha(i-1) | a(i-1) | d(i)   | theta(i)
 ---   | ---        | ---    | ---    | ---
 0->1  | 0          | 0      | 0.75   | q1
