@@ -34,10 +34,24 @@ You're reading it!
 ### Kinematic Analysis
 #### 1. Run the forward_kinematics demo and evaluate the kr210.urdf.xacro file to perform kinematic analysis of Kuka KR210 robot and derive its DH parameters.
 
-Foward Kinematics Example 1 ![forward kinematics](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/forward_kinematics.png)
+Foward Kinematics Example 1 (recreate the gripper position/pose given in forward kinematics figure as a test FK is working)  ![forward kinematics](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/forward_kinematics.png)
 Forward Kinematics Example 2 ![forward kinematics2](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/forward_kinematics_2.png)
 
 #### 2. Using the DH parameter table you derived earlier, create individual transformation matrices about each joint. In addition, also generate a generalized homogeneous transform between base_link and gripper_link using only end-effector(gripper) pose.
+
+##### DH Parameters
+To get the DH parameters. 
+
+1. Label all the joints
+2. labels all links starting from fixed base link as 0.
+3. Draw lines through joints and define joint axes
+4. Assign z-axes for each frame to point along the joint axis.
+5. Identify common normal between Z_{i-1} and Z_{i}
+Allocate the X axis based on the DH parameter rules. Please see figure for more details.
+
+DH parameters and axis allocation ![DH parameters](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/dh_parameters_hand.png)
+
+DH parameters and axis allocation ![DH parameters](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/dh_parameters_table_hand.png)
 
 Links | alpha(i-1) | a(i-1) | d(i)   | theta(i)
 ---   | ---        | ---    | ---    | ---
@@ -49,7 +63,7 @@ Links | alpha(i-1) | a(i-1) | d(i)   | theta(i)
 5->6  | -pi/2      | 0      | 0      | q6
 6->EE | 0          | 0      | 0.303  | 0
 
-Individual transformations:
+###### Individual transformations:
 T0_1 = Matrix([
 [cos(q1), -sin(q1), 0,    0],
 [sin(q1),  cos(q1), 0,    0],
@@ -100,8 +114,7 @@ Matrix([
 [0, 0, 1, 0.303],
 [0, 0, 0,     1]])
 
-Values for zero configuration that is {q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}
-
+##### Values for transform matrixes from base frame for the zero configuration: {q1:0, q2:0, q3:0, q4:0, q5:0, q6:0}
 ('T0_1 = ', Matrix([
 [1.0,   0,   0,    0],
 [  0, 1.0,   0,    0],
@@ -159,13 +172,14 @@ T = Matrix([
 [0_vector | 1       ],
 ])
 
+##### End-effector position and pose
 P_vector = Px, Py, Pz = [-1.3863, 0.02074, 0.90986]
 
 orientation_euler = [0.01735, -0.2179, 0.9025, 0.371016]
 
 [roll, pitch, yaw] = [-0.39818863537626115, -0.19423603941828343, 2.400827937066692]
 
-## Rotation Matrix from end effector: ##
+##### Rotation Matrix from end effector:
 
 Matrix([
 [-0.130379773257434, 0.677285271388215, -0.724075808107087,  -1.38628179843151],
@@ -176,23 +190,28 @@ Matrix([
 
 #### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and inverse Orientation Kinematics; doing so derive the equations to calculate all individual joint angles.
 
-
 Since the last 3 joints are revolute and their axes intersect at a single point, we have a case of spherical wrist with joint_5 being the wrist center. This allows us to kinematically decouple Inverse kinematics into inverse position and inverse orientation. That is instead of solving 12 non-linear equations, it is now possible to independently solve 2 simpler problems -- 1. cartesian coordiates of the wrist center  2. composition of the rrotations to orient the end effector
 
-## Computing wrist center from end-effector pose and location ##
+##### Computing wrist center from end-effector pose and location 
 1. Compute the end-effector pose with respect to the base_link that is R_rpy (using the correctional rotational matrix)
    R_rpy = rot(z,yaw) * rot(y, pitch) * rot(x, roll) * R_corr. roll, pitch, yaw are known from the end-effector pose. 
 2. Get the nx, ny, nz component of the z-axis of the end effector from the R_rpy. R_rpy[:,2]
 3. px, py, pz is obtained from the gripper position which is known. 
 4. Using this information and substituting d6 and l we can get the wx, wy, wz.
 
-## Computing theta1, theta2, theta3 from wrist center ##
+#####  Computing theta1, theta2, theta3 from wrist center 
 Once we get the wrist center wx, wy, wz we can compute the joint angles theta1, theta2, theta3. There is no clear strategy but we can use trignometry to project the 3D configuration in different subspace x-z, x-y and y-z space. For solving this problem we used the following method. Please see figure below for more details. 
 Figure for angle derivation ![forward kinematics](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/hand_figure.png)
 
 The wrist center and the end-effector is wrt to the base frame '0' that is 0_r_{WC/0} and 0_r_{EE/0} respectively. Since the joint1 only rotates around the z axis, theta1 only effects the end effector x and y coordinates. We subtract the x and z shift to get the x, y, z location of wrist center with respect to joint_2 and joint_3. Once this is done, we get the schematic shown in figure (taken from course). 
+
+##### Supporting figures 
+
 Schematic for angle computation ![schematic angle](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/angles_figure_from_course.png)
 
+Derivation Figure 1 ![hand_drawing1](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/angle_derivation_hand.png))
+
+##### Derivation 
 wx, wy, wz are coordinates with respect to base link.
 Once we have the sides A, B and C it is easy to compute the angle theta2, theta3. 
 C = 1.25 which is the link length from DH parameter table between joint 2 and 3. 
@@ -207,24 +226,25 @@ angle_b = cos_angle(side_b, side_a, side_c)
 angle_c = cos_angle(side_c, side_a, side_b)
 
 Once these angles are known. 
-## theta1 ## 
+#####  theta1
 theta1 = atan2(wx,wy)
 
-## theta2 ## 
+#####  theta2 
 theta2 is the angle wrt to the y axis and is given by 
 theta2 = pi/2 - angle_a - atan2(wc_z_joint2, wc_xy_joint2). 
 
-## theta3 ## 
+#####  theta3
 theta3 =  pi/2 - (angle_b - angle_3_4), where angle_3_4 is given by  angle_3_4 = atan2(a3,d4). a3=-0.054 and d4=1.50
 Here we subtract angle_3_4 because in zeroth configuration we have that angle. 
 
 
-## Computing theta4, theta5, theta6 from R3_6 ##
+
+#####  Computing theta4, theta5, theta6 from R3_6 
  1. We first compute R3_6. Once theta1, theta2, theta3 is known, we can compute R0_3 and multiply its inv(R0_3) with R_rpy to get R3_6. 
  2. Compute the euler angles corresponding to the matrix R3_6. This can be done by realizing that the pose is a composition of the following R3_6 = rot_x(-pi/2) * rot_z(q4) * rot_y(q5) * rot_x(pi/2) * rot_z(q6) * R_corr
 
-And here's where you can draw out and show your math for the derivation of your theta angles. 
-Figure and Derivation ![drawing](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/notes_derivation.png))
+Derivation for angle theta4, theta5, theta6 ![course_fig](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/angle_derivation_hand.png))
+
 
 ### Project Implementation
 
