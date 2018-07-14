@@ -112,7 +112,7 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables):
     wz = pz - (d6_val + l_val)*nz
 
     # calculate the sides A, B, C
-    side_a = 1.501
+    side_a = 1.500971 # 1.500971 sqrt(a3^2+d4^2)
     side_c = 1.25
     # side_b is computation of wc coordinate from joint 1. so subtract joint_0 (x and z shifts)
     wc_z_joint2 = (wz - 0.75)
@@ -218,7 +218,8 @@ def handle_calculate_IK(req):
         if 0:
             print('T0_G_eval:{}'.format(T0_G.evalf(subs={q1: 0, q2: 0, q3: 0, q4: 0, q5:0, q6:0})))
             print('T0_G:{}'.format(simplify(T0_G)))
-            
+
+        # Rrpy is the rotation transform between the gripper and the 
         r, p, y = symbols('r p y')
         R_x = rot_x(r)
         R_y = rot_y(p)

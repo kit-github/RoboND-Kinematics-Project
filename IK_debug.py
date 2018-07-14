@@ -117,7 +117,7 @@ def inverse_kinematics(gripper_position, gripper_angles, aux_variables, test_cas
     wz = pz - (d6_val + l_val)*nz
 
     # calculate the sides A, B, C
-    side_a = 1.501
+    side_a = 1.500971
     side_c = 1.25
     # side_b is computation of wc coordinate from joint 1. so subtract joint_0 (x and z shifts)
     wc_z_joint2 = (wz - 0.75)
@@ -382,6 +382,6 @@ def test_code(test_case):
 
 if __name__ == "__main__":
     # Change test case number for different scenarios
-    test_case_number = 3
+    test_case_number = 1
 
     test_code(test_cases[test_case_number])

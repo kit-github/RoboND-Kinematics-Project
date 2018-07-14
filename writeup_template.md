@@ -181,15 +181,11 @@ since the last 3 joints are revolute and their axes intersect at a single point 
 3. px, py, pz is obtained from the gripper position.
 4. using this info and substituting for d6 and l we can get the wx, wy, wz.
 
-The wrist center wx, wy, wz depends on the joint angles theta1, theta2, theta3. Using trignometry and projecting hte axis in subspaces, we can find these angles. Please see figure below for more details. In particular, the firstjoint only rotates around the z axis. We subtract the x and z shift to get the x,y, z location of joint_2 and joint_3, with respect to joint_1. Once this is done, it is easier to calculate angle_a, angle_b and angle_c (see figure 2 below). side_a  and side_c are computed 
+The wrist center wx, wy, wz depends on the joint angles theta1, theta2, theta3. Using trignometry and projecting hte axis in subspaces, we can find these angles. Please see figure below for more details. Also note that everything location of wrist center and the end-effector is wrt to the base frame '0' so 0_r_{WC/0} and 0_r_{EE/0} respectively. In particular, the first joint (joint 1) only rotates around the z axis. We subtract the x and z shift to get the x,y, z location of joint_2 and joint_3, with respect to joint_1. Once this is done, it is easier to calculate angle_a, angle_b and angle_c (see figure 2 below). side_a  and side_c are computed 
 
-
-
-
-
-
-
-
+Computation for theta4, theta5, theta6. 
+ 1. Once theta1, theta2, theta3 is known, we can compute R0_3 and multiply its inverse with R_rpy to get R3_6. 
+ 2. Compute the euler angles corresponding to the matrix R3_6. This can be done by realizing that the pose is a composition of the following R3_6 = rot_x(-pi/2) * rot_z(q4) * rot_y(q5) * rot_x(pi/2) * rot_z(q6) * R_corr
 
 And here's where you can draw out and show your math for the derivation of your theta angles. 
 Figure and Derivation ![drawing](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/notes_derivation.png))
@@ -198,8 +194,12 @@ Figure and Derivation ![drawing](https://github.com/kit-github/RoboND-Kinematics
 
 #### 1. Fill in the `IK_server.py` file with properly commented python code for calculating Inverse Kinematics based on previously performed Kinematic Analysis. Your code must guide the robot to successfully complete 8/10 pick and place cycles. Briefly discuss the code you implemented and your results. 
 
+ -- Add some screen shots to show how this worked. 
+ -- it doesn't work. Perhaps use inv(R0_3) instead of R0_3.T
+ -- also the side angle 
 
 Here I'll talk about the code, what techniques I used, what worked and why, where the implementation might fail and how I might improve it if I were going to pursue this project further.  
+  - Not sure what??     
 
 
 And just for fun, another example image:

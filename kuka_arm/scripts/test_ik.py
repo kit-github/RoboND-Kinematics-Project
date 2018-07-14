@@ -103,7 +103,7 @@ def inverse_kinematics(gt_gripper_position, gt_gripper_orientation_quaternion, f
     theta1 = atan2(wy,wx)*rtd
 
     # calculate the sides A, B, C
-    side_a = 1.501
+    side_a = 1.500971
     side_c = 1.25
     # side_b is computation of wc coordinate from joint 1. so subtract joint_0 (x and z shifts)
     wc_z_joint2 = wz - 0.75
