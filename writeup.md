@@ -202,7 +202,6 @@ Since the last 3 joints are revolute and their axes intersect at a single point,
 
 #####  Computing theta1, theta2, theta3 from wrist center 
 Once we get the wrist center wx, wy, wz we can compute the joint angles theta1, theta2, theta3. There is no clear strategy but we can use trignometry to project the 3D configuration in different subspace x-z, x-y and y-z space. For solving this problem we used the following method. Please see figure below for more details. 
-Figure for angle derivation ![forward kinematics](https://github.com/kit-github/RoboND-Kinematics-Project/blob/master/data/writeup/hand_figure.png)
 
 The wrist center and the end-effector is wrt to the base frame '0' that is 0_r_{WC/0} and 0_r_{EE/0} respectively. Since the joint1 only rotates around the z axis, theta1 only effects the end effector x and y coordinates. We subtract the x and z shift to get the x, y, z location of wrist center with respect to joint_2 and joint_3. Once this is done, we get the schematic shown in figure (taken from course). 
 
@@ -226,15 +225,12 @@ angle_a = cos_angle(side_a, side_b, side_c)
 angle_b = cos_angle(side_b, side_a, side_c)
 angle_c = cos_angle(side_c, side_a, side_b)
 
-Once these angles are known. 
-#####  theta1
+Once these angles are known we can compute theta1, theta2, and theta3 as follows.
 theta1 = atan2(wx,wy)
 
-#####  theta2 
 theta2 is the angle wrt to the y axis and is given by 
 theta2 = pi/2 - angle_a - atan2(wc_z_joint2, wc_xy_joint2). 
 
-#####  theta3
 theta3 =  pi/2 - (angle_b - angle_3_4), where angle_3_4 is given by  angle_3_4 = atan2(a3,d4). a3=-0.054 and d4=1.50
 Here we subtract angle_3_4 because in zeroth configuration we have that angle. 
 
